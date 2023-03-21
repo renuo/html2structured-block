@@ -150,7 +150,8 @@ Go to:
 - Copy the `Model ID`
 
 ```javascript
-result = await html2block(html, client, model_id);
+Add pass the Model ID of the `Image Block`
+let html2datocms = new HTML2DatoCMS(client, image_block_id);
 ```
 
 ### Handling Unknown HTML Tags
