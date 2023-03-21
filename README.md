@@ -5,7 +5,7 @@
 This project provides a utility to convert HTML content into structured text format, which can be used with DatoCMS.
 The converter handles various HTML elements and converts them into appropriate structured text blocks and inline elements.
 
-**How to Run**
+## How to Run
 
 Install the required dependencies:
 ```bash
@@ -23,12 +23,17 @@ const html = '<p>Example HTML content</p>';
 const structured_text = await html2block(html);
 ```
 
-**Advanced Usage**
+### Advanced Usage
+
+The `html2datocms.js` module provides a number of functions that can be used to convert HTML content to structured text, upload images to DatoCMS, and fetch records from DatoCMS.
+
+The following functions are available:
+
+**html2block**
+
+Converts HTML content to structured text.
 
 ```javascript
-const html2datocms = require('./html2datocms.js');
-
-// 1. html2block
 const html = '<p>Hello, world!</p>';
 html2datocms.html2block(html)
     .then(structured_text => {
@@ -37,28 +42,41 @@ html2datocms.html2block(html)
     .catch(error => {
         console.error(error);
     });
+```
 
-// 2. boolToDatoCMS
+**boolToDatoCMS**
+
+Converts a boolean value (loaded from a JSON or CSV file) to a boolean value.
+
+```javascript
 const boolValue = "true";
 const datoCMSBoolValue = html2datocms.boolToDatoCMS(boolValue);
 console.log('DatoCMS boolean value:', datoCMSBoolValue);
+```
 
-// 3. fetch_records
-const buildClient = require('@datocms/cma-client-node').buildClient;
-const client = buildClient({ apiToken: 'YOUR_API_TOKEN' });
+**fetchRecords**
+
+Fetches records from DatoCMS. Can be used to check if a record already exists before creating a new one or to fetch related records. See the [example.js](example/example.js) file for a complete example.
+
+```javascript
 const itemType = 'YOUR_ITEM_TYPE';
 const field = 'YOUR_FIELD';
 const value = 'YOUR_VALUE';
 
-html2datocms.fetch_records(itemType, field, value, client)
+html2datocms.fetchRecords(itemType, field, value, client)
     .then(records => {
         console.log(records);
     })
     .catch(error => {
         console.error(error);
     });
+```
 
-// 4. uploadToDatoCMS
+**uploadToDatoCMS**
+
+Uploads an image to DatoCMS. Also used by the `html2block` function to upload images referenced in `<img>` tags. See the [example.js](example/example.js) file for a complete example.
+
+```javascript
 const imageUrl = 'https://example.com/image.jpg';
 
 html2datocms.uploadToDatoCMS(imageUrl, client)
@@ -70,7 +88,7 @@ html2datocms.uploadToDatoCMS(imageUrl, client)
     });
 ```
 
-**Complete Example**
+### Complete Example
 
 Check out the [example.js](example/example.js) file for a complete example of how to use the converter.
 
@@ -80,7 +98,7 @@ The model we used on DatoCMS is the following:
     <img src="example/image_block.png" max-width="600px">
 </center>
 
-**How to Test**
+## How to Test
 
 Run the test suite:
 ```bash
@@ -114,7 +132,7 @@ Replace `YOUR_API_TOKEN` with your actual DatoCMS API token.
 Now you can use the DatoCMS client with the functions provided in the `html2datocms.js` module, such as `uploadToDatoCMS` and `fetchRecords`.
 
 
-## Custom Tags
+### Custom Tags
 
 **IMG-Tags/Image Block**
 
@@ -132,7 +150,7 @@ Go to:
 result = await html2block(html, client, model_id);
 ```
 
-**Handling Unknown HTML Tags**
+### Handling Unknown HTML Tags
 
 This project is designed to handle a variety of common HTML tags and convert them into structured text.
 However, there may be cases where the code encounters an unknown or unsupported HTML tag.
