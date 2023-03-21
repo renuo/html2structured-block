@@ -37,7 +37,7 @@ html2datocms.html2block(html)
     });
 
 // 2. boolToDatoCMS
-const boolValue = true;
+const boolValue = "true";
 const datoCMSBoolValue = html2datocms.boolToDatoCMS(boolValue);
 console.log('DatoCMS boolean value:', datoCMSBoolValue);
 
