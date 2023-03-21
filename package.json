@@ -1,6 +1,7 @@
 {
   "scripts": {
     "test": "jest",
+    "coverage": "jest --collect-coverage",
     "lint": "eslint ."
   },
   "dependencies": {

@@ -106,6 +106,16 @@ test('converts <aside> tag to structured text', async () => {
   )
 })
 
+test('converts <blockquote> tag to structured text', async () => {
+  const html = '<blockquote>Example blockquote text</blockquote>'
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toStrictEqual(
+    addRootNode([
+      { type: 'blockquote', children: [{ type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example blockquote text' }] }] }
+    ])
+  )
+})
+
 test('handles unknown tag and generates error block', async () => {
   const html = '<unknown>Unknown content</unknown>'
   const structuredText = await new HTML2DatoCMS().html2block(html)
@@ -172,6 +182,45 @@ test('handles <img> tag with broken \'src\' attribute and generates error block'
   )
 })
 
+test('converts normal text to structured text', async () => {
+  const html = 'Example text'
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toStrictEqual(
+    addRootNode([{ type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example text' }] }])
+  )
+})
+
+test('removes empty tags', async () => {
+  const html = '<p></p><p>Example text</p><p class="test"><p></p></p><h1></h1><span></span><b></b><blockquote></blockquote>'
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toStrictEqual(
+    addRootNode([{ type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example text' }] }])
+  )
+})
+test('ignores <div>, <main>, <br>', async () => {
+  const html = '<div>Example text</div> <main>Example text</main><br>'
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toStrictEqual(
+    addRootNode([{ type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example text Example text' }] }])
+  )
+})
+
+test('handles empty string', async () => {
+  const html = ''
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toStrictEqual(
+    addRootNode([])
+  )
+})
+
+test('handles empty new line', async () => {
+  const html = '\n\nExample text\n\n'
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toStrictEqual(
+    addRootNode([{ type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example text' }] }])
+  )
+})
+
 test('boolToDatoCMS converts string boolean values to boolean', () => {
   expect(new HTML2DatoCMS().boolToDatoCMS('true')).toBe(true)
   expect(new HTML2DatoCMS().boolToDatoCMS('false')).toBe(false)
@@ -187,6 +236,18 @@ test('uploadToDatoCMS uploads image and returns upload id', async () => {
   expect(result).toStrictEqual({ upload_id: 'mock_image_id' })
   expect(clientMock.uploads.createFromUrl).toHaveBeenCalledWith({
     url: imageUrl,
+    skipCreationIfAlreadyExists: true
+  })
+})
+
+test('uploadToDatoCMS handles upload errors', async () => {
+  const clientMock = { uploads: { createFromUrl: jest.fn() } }
+  clientMock.uploads.createFromUrl.mockRejectedValue(new Error('Upload failed'))
+  const result = await new HTML2DatoCMS(clientMock).uploadToDatoCMS('')
+
+  expect(result).toStrictEqual(null)
+  expect(clientMock.uploads.createFromUrl).toHaveBeenCalledWith({
+    url: '',
     skipCreationIfAlreadyExists: true
   })
 })

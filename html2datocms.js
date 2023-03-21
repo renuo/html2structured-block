@@ -104,11 +104,11 @@ class HTML2DatoCMS {
       } else if (child.nodeName === 'HR') {
         structuredTextNode.push({ type: 'thematicBreak' })
       } else if (child.nodeName === 'BLOCKQUOTE') {
-        const bC = await this.buildTree(child.childNodes)
-        if (bC.length === 0) continue
+        const quote = await this.buildTree(child.childNodes)
+        if (quote.length === 0) continue
         structuredTextNode.push({
           type: 'blockquote',
-          children: [{ children: bC, type: 'paragraph' }]
+          children: [{ children: quote, type: 'paragraph' }]
         })
       } else if (child.nodeName === 'ASIDE') {
         structuredTextNode.push({
@@ -141,8 +141,12 @@ class HTML2DatoCMS {
     }
   }
 
+  addRootNode (node) {
+    return { schema: 'dast', document: { type: 'root', children: node } }
+  }
+
   async html2block (html) {
-    if (!html) return { schema: 'dast', document: { type: 'root', children: [] } }
+    if (!html) return this.addRootNode([])
 
     this.rootStructuredTextNode = []
 
@@ -168,7 +172,7 @@ class HTML2DatoCMS {
     const dom = new JSDOM(`<!DOCTYPE html><body>${newHtml}</body>`)
     const nodes = dom.window.document.body.childNodes
 
-    return { schema: 'dast', document: { type: 'root', children: await this.buildTree(nodes, true) } }
+    return this.addRootNode(await this.buildTree(nodes, true))
   }
 
   async uploadToDatoCMS (imageUrl) {
