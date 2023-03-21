@@ -1,6 +1,6 @@
 const { HTML2DatoCMS } = require('./html2datocms.js')
 
-function addRootNode(structuredTextNode) {
+function addRootNode (structuredTextNode) {
   return {
     schema: 'dast',
     document: {
@@ -146,7 +146,7 @@ test('converts <img> tag to structured text', async () => {
   })
 })
 
-test(`handles <img> tag without 'src' attribute and generates error block`, async () => {
+test('handles <img> tag without \'src\' attribute and generates error block', async () => {
   const html = '<img alt="Example image">'
   const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toMatchObject(
@@ -159,7 +159,7 @@ test(`handles <img> tag without 'src' attribute and generates error block`, asyn
   )
 })
 
-test(`handles <img> tag with broken 'src' attribute and generates error block`, async () => {
+test('handles <img> tag with broken \'src\' attribute and generates error block', async () => {
   const html = '<img src="https://example.com/image.jpg" alt="Example image">'
   const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toMatchObject(
@@ -241,7 +241,7 @@ test('using same instance of HTML2DatoCMS for multiple conversions', async () =>
 
   expect(clientMock.uploads.createFromUrl).toHaveBeenCalledTimes(1)
 
-  const img = "https://example.com/image.jpg"
+  const img = 'https://example.com/image.jpg'
   const uploadId = await html2DatoCMS.uploadToDatoCMS(img)
   expect(uploadId).toStrictEqual({ upload_id: 'mock_image_id' })
 
