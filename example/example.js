@@ -1,5 +1,5 @@
-const { HTML2DatoCMS } = require('../html2datocms.js')
 const { buildClient } = require('@datocms/cma-client-node')
+const { HTML2DatoCMS } = require('../html2datocms.js')
 
 DATO_ITEM_TYPE_ID = 'YOUR_ITEM_TYPE_ID'
 DATO_IMG_BLOCK_ID = 'YOUR_IMG_BLOCK_ID'
@@ -36,10 +36,10 @@ async function example () {
   datoCategories = []
   for (let i = 0; i < exampleData.categories.length; i++) {
     const category = exampleData.categories[i]
-    const records = await h2d.fetchRecords('category', 'name', category, client)
+    const categoryRecords = await h2d.fetchRecords('category', 'name', category, client)
 
-    if (records.length > 0) datoCategories.push(records[0].id.toString())
-    else console.log('Category ' + category + ' not found!')
+    if (categoryRecords.length > 0) datoCategories.push(categoryRecords[0].id.toString())
+    else console.log(`Category ${category} not found!`)
   }
 
   const datoItem = {
@@ -61,7 +61,7 @@ async function example () {
 
     // To inspect the item if something is wrong
     const fs = require('fs')
-    fs.writeFile('example_dato_item.json', JSON.stringify(datoItem), function () { })
+    fs.writeFile('example_dato_item.json', JSON.stringify(datoItem), () => { })
 
     console.log('Error while creating item. Check example_dato_item.json')
   })

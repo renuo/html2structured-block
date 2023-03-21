@@ -8,4 +8,5 @@ parserOptions:
   sourceType: module
 rules: {
   no-undef: off,
+  no-shadow: error,
 }
