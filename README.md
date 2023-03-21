@@ -70,6 +70,16 @@ html2datocms.uploadToDatoCMS(imageUrl, client)
     });
 ```
 
+**Complete Example**
+
+Check out the [example.js](example/example.js) file for a complete example of how to use the converter.
+
+The model we used on DatoCMS is the following:
+<center>
+    <img src="example/my_item.png" max-width="600px">
+    <img src="example/image_block.png" max-width="600px">
+</center>
+
 **How to Test**
 
 Run the test suite:
