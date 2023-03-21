@@ -37,7 +37,7 @@ Install the DatoCMS client package:
 npm install @datocms/cma-client-node
 ```
 
-Import the buildClient function from the DatoCMS client package:
+Import the `buildClient` function from the DatoCMS client package:
 ```javascript
 const buildClient = require('@datocms/cma-client-node').buildClient;
 ```
