@@ -1,12 +1,12 @@
 const { JSDOM } = require('jsdom')
 
 class HTML2DatoCMS {
-  constructor (client, imageBlockId) {
+  constructor(client, imageBlockId) {
     this.client = client
     this.imageBlockId = imageBlockId
   }
 
-  async buildTree (nodes, isRoot = false) {
+  async buildTree(nodes, isRoot = false) {
     let structuredTextNode = []
     if (isRoot) structuredTextNode = this.rootStructuredTextNode
 
@@ -66,7 +66,7 @@ class HTML2DatoCMS {
       } else if (child.nodeName === 'IMG') {
         const uploadPhoto = await this.uploadToDatoCMS(child.src)
         if (uploadPhoto === null) {
-          this.rootStructuredTextNode.push(await this.errorBlock(`Image upload failed: ${imageUrl}`))
+          this.rootStructuredTextNode.push(await this.errorBlock(`Image upload failed: ${child.src}`))
           continue
         }
         this.rootStructuredTextNode.push({
@@ -132,7 +132,7 @@ class HTML2DatoCMS {
     return structuredTextNode
   }
 
-  async errorBlock (error) {
+  async errorBlock(error) {
     error = `${error.substring(0, 500)}...`
     console.log(`!!!!!!!! Error !!!!!!!! ${error}`)
     return {
@@ -141,7 +141,7 @@ class HTML2DatoCMS {
     }
   }
 
-  async html2block (html) {
+  async html2block(html) {
     if (!html) return { schema: 'dast', document: { type: 'root', children: [] } }
 
     this.rootStructuredTextNode = []
@@ -171,7 +171,7 @@ class HTML2DatoCMS {
     return { schema: 'dast', document: { type: 'root', children: await this.buildTree(nodes, true) } }
   }
 
-  async uploadToDatoCMS (imageUrl) {
+  async uploadToDatoCMS(imageUrl) {
     try {
       const uploadPhoto = await this.client.uploads.createFromUrl({
         url: imageUrl,
@@ -188,11 +188,11 @@ class HTML2DatoCMS {
     }
   }
 
-  boolToDatoCMS (bool) {
+  boolToDatoCMS(bool) {
     return bool === 'true'
   }
 
-  async fetchRecords (type, field, value) {
+  async fetchRecords(type, field, value) {
     const records = await this.client.items.list({
       filter: {
         type,

@@ -1,11 +1,6 @@
 const { HTML2DatoCMS } = require('./html2datocms.js')
 
-const clientMock = {
-  uploads: { createFromUrl: jest.fn() },
-  items: { list: jest.fn() }
-}
-
-function addRootNode (structuredTextNode) {
+function addRootNode(structuredTextNode) {
   return {
     schema: 'dast',
     document: {
@@ -125,6 +120,7 @@ test('handles unknown tag and generates error block', async () => {
 })
 
 test('converts <img> tag to structured text', async () => {
+  const clientMock = { uploads: { createFromUrl: jest.fn() } }
   clientMock.uploads.createFromUrl.mockResolvedValue({ id: 'mock_image_id' })
 
   const html = '<img src="https://example.com/image.jpg" alt="Example image">'
@@ -150,12 +146,39 @@ test('converts <img> tag to structured text', async () => {
   })
 })
 
+test(`handles <img> tag without 'src' attribute and generates error block`, async () => {
+  const html = '<img alt="Example image">'
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toMatchObject(
+    addRootNode([{
+      type: 'paragraph',
+      children: [
+        { type: 'span', marks: ['strong'], value: expect.stringContaining('!!!!!!!! Error !!!!!!!! Image upload failed: ...') }
+      ]
+    }])
+  )
+})
+
+test(`handles <img> tag with broken 'src' attribute and generates error block`, async () => {
+  const html = '<img src="https://example.com/image.jpg" alt="Example image">'
+  const structuredText = await new HTML2DatoCMS().html2block(html)
+  expect(structuredText).toMatchObject(
+    addRootNode([{
+      type: 'paragraph',
+      children: [
+        { type: 'span', marks: ['strong'], value: expect.stringContaining('!!!!!!!! Error !!!!!!!! Image upload failed: https://example.com/image.jpg...') }
+      ]
+    }])
+  )
+})
+
 test('boolToDatoCMS converts string boolean values to boolean', () => {
   expect(new HTML2DatoCMS().boolToDatoCMS('true')).toBe(true)
   expect(new HTML2DatoCMS().boolToDatoCMS('false')).toBe(false)
 })
 
 test('uploadToDatoCMS uploads image and returns upload id', async () => {
+  const clientMock = { uploads: { createFromUrl: jest.fn() } }
   clientMock.uploads.createFromUrl.mockResolvedValue({ id: 'mock_image_id' })
 
   const imageUrl = 'https://example.com/image.jpg'
@@ -169,6 +192,7 @@ test('uploadToDatoCMS uploads image and returns upload id', async () => {
 })
 
 test('fetchRecords fetches records from DatoCMS', async () => {
+  const clientMock = { items: { list: jest.fn() } }
   const mockRecords = [{ id: 'record1' }, { id: 'record2' }]
   clientMock.items.list.mockResolvedValue(mockRecords)
 
@@ -187,4 +211,39 @@ test('fetchRecords fetches records from DatoCMS', async () => {
     page: { limit: 100 },
     version: 'current'
   })
+})
+
+test('using same instance of HTML2DatoCMS for multiple conversions', async () => {
+  const clientMock = { uploads: { createFromUrl: jest.fn() } }
+  clientMock.uploads.createFromUrl.mockResolvedValue({ id: 'mock_image_id' })
+
+  const sampleBlockId = '123456'
+  const html2DatoCMS = new HTML2DatoCMS(clientMock, sampleBlockId)
+  const html = '<p>Example text</p>'
+  const structuredText = await html2DatoCMS.html2block(html)
+  expect(structuredText).toStrictEqual(
+    addRootNode([{ type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example text' }] }])
+  )
+
+  const html2 = '<p>Example text 2</p>'
+  const structuredText2 = await html2DatoCMS.html2block(html2)
+  expect(structuredText2).toStrictEqual(
+    addRootNode([{ type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example text 2' }] }])
+  )
+
+  expect(clientMock.uploads.createFromUrl).toHaveBeenCalledTimes(0)
+
+  const html3 = '<img src="https://example.com/image.jpg" alt="Example image">'
+  const structuredText3 = await html2DatoCMS.html2block(html3)
+  expect(structuredText3).toStrictEqual(
+    addRootNode([{ type: 'block', item: { type: 'item', attributes: { image: { upload_id: 'mock_image_id' } }, relationships: { item_type: { data: { id: sampleBlockId, type: 'item_type' } } } } }])
+  )
+
+  expect(clientMock.uploads.createFromUrl).toHaveBeenCalledTimes(1)
+
+  const img = "https://example.com/image.jpg"
+  const uploadId = await html2DatoCMS.uploadToDatoCMS(img)
+  expect(uploadId).toStrictEqual({ upload_id: 'mock_image_id' })
+
+  expect(clientMock.uploads.createFromUrl).toHaveBeenCalledTimes(2)
 })
