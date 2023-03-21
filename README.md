@@ -14,13 +14,16 @@ npm install
 
 Include the module in your project:
 ```javascript
-const html2block = require('./html2datocms.js').html2block;
+const { HTML2DatoCMS } = require('./html2datocms.js');
+// client is a DatoCMS client, only needed for image upload (see below)
+// image_block_id is the ID of the image block in your DatoCMS project, only needed for image upload (see below)
+let html2datocms = new HTML2DatoCMS(client, image_block_id);
 ```
 
 Use the html2block function to convert HTML content to structured text:
 ```javascript
 const html = '<p>Example HTML content</p>';
-const structured_text = await html2block(html);
+const structured_text = await html2datocms.html2block(html);
 ```
 
 ### Advanced Usage
@@ -63,7 +66,7 @@ const itemType = 'YOUR_ITEM_TYPE';
 const field = 'YOUR_FIELD';
 const value = 'YOUR_VALUE';
 
-html2datocms.fetchRecords(itemType, field, value, client)
+html2datocms.fetchRecords(itemType, field, value)
     .then(records => {
         console.log(records);
     })
@@ -79,7 +82,7 @@ Uploads an image to DatoCMS. Also used by the `html2block` function to upload im
 ```javascript
 const imageUrl = 'https://example.com/image.jpg';
 
-html2datocms.uploadToDatoCMS(imageUrl, client)
+html2datocms.uploadToDatoCMS(imageUrl)
     .then(upload => {
         console.log(upload);
     })
