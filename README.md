@@ -149,8 +149,8 @@ Go to:
 - Create a Block called for example `Image Block`
 - Copy the `Model ID`
 
-```javascript
 Add pass the Model ID of the `Image Block`
+```javascript
 let html2datocms = new HTML2DatoCMS(client, image_block_id);
 ```
 
