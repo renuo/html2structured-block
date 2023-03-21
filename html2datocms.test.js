@@ -1,6 +1,4 @@
-const {
-  html2block, boolToDatoCMS, fetchRecords, uploadToDatoCMS
-} = require('./html2datocms.js')
+const { HTML2DatoCMS } = require('./html2datocms.js')
 
 const clientMock = {
   uploads: { createFromUrl: jest.fn() },
@@ -19,7 +17,7 @@ function addRootNode (structuredTextNode) {
 
 test('converts heading tags to structured text', async () => {
   const html = '<h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3><h4>Heading 4</h4><h5>Heading 5</h5><h6>Heading 6</h6>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
 
   const expectedChildren = []
   for (let level = 1; level <= 6; level++) {
@@ -31,7 +29,7 @@ test('converts heading tags to structured text', async () => {
 
 test('converts link tags to structured text', async () => {
   const html = '<a href="https://www.example.com/">Example Link</a>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toStrictEqual(
     addRootNode([{
       type: 'paragraph',
@@ -49,7 +47,7 @@ test('converts link tags to structured text', async () => {
 
 test('converts bold, italic, and underline tags to structured text', async () => {
   const html = '<p><strong>Bold Text</strong><i>Italic Text</i><u>Underlined Text</u></p>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toStrictEqual(
     addRootNode([{
       type: 'paragraph',
@@ -64,7 +62,7 @@ test('converts bold, italic, and underline tags to structured text', async () =>
 
 test('converts list tags to structured text', async () => {
   const html = '<ul><li>Item 1</li><li>Item 2</li></ul><ol><li>Item 1</li><li>Item 2</li></ol>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toStrictEqual(
     addRootNode([
       {
@@ -89,7 +87,7 @@ test('converts list tags to structured text', async () => {
 
 test('converts <code> tag to structured text', async () => {
   const html = '<code>console.log("Hello, World!");</code>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toStrictEqual(
     addRootNode([{ type: 'code', code: 'console.log("Hello, World!");' }])
   )
@@ -97,7 +95,7 @@ test('converts <code> tag to structured text', async () => {
 
 test('converts <hr> tag to structured text', async () => {
   const html = '<hr>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toStrictEqual(
     addRootNode([{ type: 'thematicBreak' }])
   )
@@ -105,7 +103,7 @@ test('converts <hr> tag to structured text', async () => {
 
 test('converts <aside> tag to structured text', async () => {
   const html = '<p><aside>Example aside text</aside></p>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toStrictEqual(
     addRootNode([
       { type: 'paragraph', children: [{ marks: [], type: 'span', value: 'Example aside text' }] }
@@ -115,7 +113,7 @@ test('converts <aside> tag to structured text', async () => {
 
 test('handles unknown tag and generates error block', async () => {
   const html = '<unknown>Unknown content</unknown>'
-  const structuredText = await html2block(html)
+  const structuredText = await new HTML2DatoCMS().html2block(html)
   expect(structuredText).toMatchObject(
     addRootNode([{
       type: 'paragraph',
@@ -131,7 +129,7 @@ test('converts <img> tag to structured text', async () => {
 
   const html = '<img src="https://example.com/image.jpg" alt="Example image">'
   const sampleBlockId = '123456'
-  const structuredText = await html2block(html, clientMock, sampleBlockId)
+  const structuredText = await new HTML2DatoCMS(clientMock, sampleBlockId).html2block(html)
 
   expect(structuredText).toStrictEqual(
     addRootNode([
@@ -153,15 +151,15 @@ test('converts <img> tag to structured text', async () => {
 })
 
 test('boolToDatoCMS converts string boolean values to boolean', () => {
-  expect(boolToDatoCMS('true')).toBe(true)
-  expect(boolToDatoCMS('false')).toBe(false)
+  expect(new HTML2DatoCMS().boolToDatoCMS('true')).toBe(true)
+  expect(new HTML2DatoCMS().boolToDatoCMS('false')).toBe(false)
 })
 
 test('uploadToDatoCMS uploads image and returns upload id', async () => {
   clientMock.uploads.createFromUrl.mockResolvedValue({ id: 'mock_image_id' })
 
   const imageUrl = 'https://example.com/image.jpg'
-  const result = await uploadToDatoCMS(imageUrl, clientMock)
+  const result = await new HTML2DatoCMS(clientMock).uploadToDatoCMS(imageUrl)
 
   expect(result).toStrictEqual({ upload_id: 'mock_image_id' })
   expect(clientMock.uploads.createFromUrl).toHaveBeenCalledWith({
@@ -178,7 +176,7 @@ test('fetchRecords fetches records from DatoCMS', async () => {
   const field = 'sample_field'
   const value = 'sample_value'
 
-  const records = await fetchRecords(type, field, value, clientMock)
+  const records = await new HTML2DatoCMS(clientMock).fetchRecords(type, field, value)
 
   expect(records).toStrictEqual(mockRecords)
   expect(clientMock.items.list).toHaveBeenCalledWith({

@@ -1,4 +1,4 @@
-const { html2block, boolToDatoCMS, fetchRecords, uploadToDatoCMS } = require('../html2datocms.js')
+const { HTML2DatoCMS } = require('../html2datocms.js')
 const { buildClient } = require('@datocms/cma-client-node')
 
 DATO_ITEM_TYPE_ID = 'YOUR_ITEM_TYPE_ID'
@@ -24,8 +24,10 @@ async function example () {
 
   const client = buildClient({ apiToken: DATO_API_TOKEN })
 
+  const h2d = new HTML2DatoCMS(client, DATO_IMG_BLOCK_ID)
+
   // check if item already exists (assuming title is unique)
-  const records = await fetchRecords('my_item', 'title', exampleData.title, client)
+  const records = await h2d.fetchRecords('my_item', 'title', exampleData.title)
   if (records.length > 0) {
     console.log('Item already exists!')
     return
@@ -34,7 +36,7 @@ async function example () {
   datoCategories = []
   for (let i = 0; i < exampleData.categories.length; i++) {
     const category = exampleData.categories[i]
-    const records = await fetchRecords('category', 'name', category, client)
+    const records = await h2d.fetchRecords('category', 'name', category, client)
 
     if (records.length > 0) datoCategories.push(records[0].id.toString())
     else console.log('Category ' + category + ' not found!')
@@ -44,13 +46,13 @@ async function example () {
     item_type: { type: 'item_type', id: DATO_ITEM_TYPE_ID },
     title: exampleData.title,
     description: {
-      en: await html2block(exampleData.description),
-      'de-CH': await html2block(exampleData.translations['de-CH'].description)
+      en: await h2d.html2block(exampleData.description),
+      'de-CH': await h2d.html2block(exampleData.translations['de-CH'].description)
     },
     // client is needed for uploading images
-    description_img: await html2block(exampleData.description_img, client, DATO_IMG_BLOCK_ID),
-    active: boolToDatoCMS(exampleData.active),
-    image: await uploadToDatoCMS(exampleData.image, client),
+    description_img: await h2d.html2block(exampleData.description_img),
+    active: h2d.boolToDatoCMS(exampleData.active),
+    image: await h2d.uploadToDatoCMS(exampleData.image),
     categories: datoCategories
   }
 
@@ -59,9 +61,9 @@ async function example () {
 
     // To inspect the item if something is wrong
     const fs = require('fs')
-    fs.writeFile('example_datoItem.json', JSON.stringify(datoItem), function () { })
+    fs.writeFile('example_dato_item.json', JSON.stringify(datoItem), function () { })
 
-    console.log('Error while creating item. Check example_datoItem.json')
+    console.log('Error while creating item. Check example_dato_item.json')
   })
 }
 
