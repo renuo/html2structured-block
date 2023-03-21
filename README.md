@@ -21,6 +21,53 @@ const html = '<p>Example HTML content</p>';
 const structured_text = await html2block(html);
 ```
 
+**Advanced Usage**
+
+```javascript
+const html2datocms = require('./html2datocms.js');
+
+// 1. html2block
+const html = '<p>Hello, world!</p>';
+html2datocms.html2block(html)
+    .then(structured_text => {
+        console.log(structured_text);
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+// 2. boolToDatoCMS
+const boolValue = true;
+const datoCMSBoolValue = html2datocms.boolToDatoCMS(boolValue);
+console.log('DatoCMS boolean value:', datoCMSBoolValue);
+
+// 3. fetch_records
+const buildClient = require('@datocms/cma-client-node').buildClient;
+const client = buildClient({ apiToken: 'YOUR_API_TOKEN' });
+const itemType = 'YOUR_ITEM_TYPE';
+const field = 'YOUR_FIELD';
+const value = 'YOUR_VALUE';
+
+html2datocms.fetch_records(itemType, field, value, client)
+    .then(records => {
+        console.log(records);
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+// 4. uploadToDatoCMS
+const imageUrl = 'https://example.com/image.jpg';
+
+html2datocms.uploadToDatoCMS(imageUrl, client)
+    .then(upload => {
+        console.log(upload);
+    })
+    .catch(error => {
+        console.error(error);
+    });
+```
+
 **How to Test**
 
 Run the test suite:
