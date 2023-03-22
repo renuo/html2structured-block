@@ -5,7 +5,8 @@
 This project provides a utility to convert HTML content into structured text format, which can be used with DatoCMS.
 The converter handles various HTML elements and converts them into appropriate structured text blocks and inline elements.
 
-[Official Documentation](https://www.datocms.com/docs/content-management-api/resources/item/create)
+[Official Documentation](https://www.datocms.com/docs/content-management-api/resources/item/create) | 
+[About Structured Blocks](https://www.datocms.com/docs/structured-text/migrating-content-to-structured-text)
 
 ## How to Run
 
