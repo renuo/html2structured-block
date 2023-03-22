@@ -1,4 +1,5 @@
-# HTML to DatoCMS Structured Text Converter
+# Simple HTML to DatoCMS Structured Text Converter
+**and some other utilities functions to speed up the migration from a Database to DatoCMS**
 
 [![Run Tests](https://github.com/renuo/html2structured-block/actions/workflows/main.yml/badge.svg)](https://github.com/renuo/html2structured-block/actions/workflows/main.yml)
 
