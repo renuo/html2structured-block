@@ -1,6 +1,6 @@
 # HTML to DatoCMS Structured Text Converter
 
-[![Run Tests](https://github.com/renuo/html2structured-block/actions/workflows/tests.yml/badge.svg)](https://github.com/renuo/html2structured-block/actions/workflows/tests.yml)
+[![Run Tests](https://github.com/renuo/html2structured-block/actions/workflows/main.yml/badge.svg)](https://github.com/renuo/html2structured-block/actions/workflows/main.yml)
 
 This project provides a utility to convert HTML content into structured text format, which can be used with DatoCMS.
 The converter handles various HTML elements and converts them into appropriate structured text blocks and inline elements.
